@@ -1,0 +1,43 @@
+# Agents
+.agents/
+.gemini/
+.github/
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node e Package Managers
+/node_modules
+npm-debug.log
+yarn-error.log
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# IDEs and editors (Ignora tudo dessas pastas)
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/
+.history/
+
+# Miscellaneous e Angular Cache
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
+
+# System files
+.DS_Store
+Thumbs.db
