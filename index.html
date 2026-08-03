@@ -5,9 +5,50 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>tf-s3-static-hosting</title>
+    <link href="/src/style.css" rel="stylesheet" />
   </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+  <body
+    class="flex min-h-screen items-center justify-center bg-neutral-950 p-4 text-neutral-100"
+  >
+    <main
+      class="flex w-full max-w-md flex-col justify-between rounded-xl border border-neutral-800 bg-neutral-900 p-6 shadow-2xl"
+    >
+      <!-- Header -->
+      <header
+        class="flex items-center space-x-3 border-b border-neutral-800 pb-6"
+      >
+        <div class="h-3 w-3 animate-pulse rounded-full bg-emerald-500"></div>
+        <h1 class="text-lg font-semibold tracking-wide text-neutral-100">
+          Static Site Deployed!
+        </h1>
+      </header>
+
+      <!-- Content / Info Grid -->
+      <dl class="space-y-3 py-6 font-mono text-sm">
+        <div class="flex justify-between">
+          <dt class="text-neutral-400">Provider:</dt>
+          <dd class="font-medium text-emerald-400">LocalStack</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-neutral-400">Orchestrator:</dt>
+          <dd class="font-medium text-purple-400">Terraform</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-neutral-400">Bundler:</dt>
+          <dd class="font-medium text-amber-400">Vite</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-neutral-400">HTTP Status:</dt>
+          <dd class="text-neutral-200">200 OK</dd>
+        </div>
+      </dl>
+
+      <!-- Footer -->
+      <footer class="border-t border-neutral-800 pt-6">
+        <p class="text-center text-xs text-neutral-400">
+          Static asset pipeline operational. Ready for testing.
+        </p>
+      </footer>
+    </main>
   </body>
 </html>
