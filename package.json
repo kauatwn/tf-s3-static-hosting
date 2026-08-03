@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "format": "prettier --write . --ignore-unknown",
+    "format:check": "prettier --check . --ignore-unknown"
   },
   "devDependencies": {
     "husky": "^9.1.7",
@@ -19,5 +21,10 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "tailwindcss": "^4.3.3"
+  },
+  "lint-staged": {
+    "*.{html,css,js,json}": [
+      "prettier --write --ignore-unknown"
+    ]
   }
 }
