@@ -1,0 +1,6 @@
+# Example configuration for LocalStack development environment
+aws_region          = "us-east-1"
+environment         = "dev"
+localstack_endpoint = "http://localhost:4566"
+domain_name         = "mysite.local"
+bucket_name         = "my-static-site-dev-bucket"
