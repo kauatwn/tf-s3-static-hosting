@@ -120,7 +120,7 @@ awslocal cloudfront create-invalidation --distribution-id $(terraform output -ra
 
 ## Estrutura do Projeto
 
-A base de código está organizada seguindo os **princípios da Clean Architecture (Arquitetura Limpa) aplicados à IaC**, segregando de forma limpa os blocos reutilizáveis de infraestrutura da orquestração do ambiente e do código frontend.
+A base de código está organizada seguindo os **princípios de IaC Modular**, segregando de forma limpa os blocos de infraestrutura reutilizáveis (Pure Modules) da orquestração do ambiente (Glue Code) e do código-fonte do frontend.
 
 ```plaintext
 tf-s3-static-hosting/
