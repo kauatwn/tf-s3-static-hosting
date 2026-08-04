@@ -1,21 +1,35 @@
 variable "domain_name" {
+  type        = string
   description = "The primary domain name for the Route 53 hosted zone (e.g., example.com)."
-  type        = string
 }
 
-variable "cloudfront_domain_name" {
-  description = "The target CloudFront distribution domain name (e.g., d111111abcdef8.cloudfront.net)."
+variable "environment" {
   type        = string
+  default     = "dev"
+  description = "Target deployment environment (e.g., dev, staging, prod)."
+
+  validation {
+    condition     = contains(["dev", "staging", "prod"], var.environment)
+    error_message = "The environment variable must be one of: 'dev', 'staging', 'prod'."
+  }
 }
 
-variable "cloudfront_hosted_zone_id" {
-  description = "The hosted zone ID for CloudFront distributions (always Z2FDTNDATAQYW2)."
-  type        = string
-  default     = "Z2FDTNDATAQYW2"
+variable "cloudfront_config" {
+  type = object({
+    domain_name    = string
+    hosted_zone_id = string
+  })
+  description = "Target CloudFront distribution parameters including domain name and hosted zone ID."
 }
 
 variable "create_zone" {
-  description = "Whether to create a new Route 53 hosted zone or look up an existing one."
   type        = bool
   default     = true
+  description = "Whether to create a new Route 53 hosted zone or look up an existing one."
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "Optional map of additional resource tags to be merged with common_tags."
 }
