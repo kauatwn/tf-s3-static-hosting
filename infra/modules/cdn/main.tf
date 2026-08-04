@@ -24,6 +24,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   is_ipv6_enabled     = true
   comment             = "Static site distribution (${var.environment})"
   default_root_object = "index.html"
+  web_acl_id          = var.web_acl_id
 
   # Custom CNAME aliases (Only set when domain_name is provided)
   aliases = var.domain_name != "" ? [var.domain_name] : []

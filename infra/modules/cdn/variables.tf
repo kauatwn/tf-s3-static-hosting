@@ -24,3 +24,9 @@ variable "create_acm_certificate" {
   type        = bool
   default     = false
 }
+
+variable "web_acl_id" {
+  description = "The ARN of the WAFv2 Web ACL to associate with CloudFront."
+  type        = string
+  default     = null
+}
