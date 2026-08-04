@@ -6,7 +6,7 @@ module "storage" {
   environment = var.environment
 }
 
-# 2. WAF Module - Web Application Firewall (Global / CloudFront Scope)
+# 2. WAF Module - Web ACL & CloudWatch Logging
 module "waf" {
   source = "../../modules/waf"
 
@@ -25,7 +25,16 @@ module "cdn" {
   web_acl_id             = module.waf.web_acl_arn
 }
 
-# 4. DNS Module - Route 53 Hosted Zone + Records
+# 4. Monitoring Module - CloudWatch Metrics & Alarms
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  environment                = var.environment
+  cloudfront_distribution_id = module.cdn.cloudfront_distribution_id
+  web_acl_name               = "waf-static-site-${var.environment}"
+}
+
+# 5. DNS Module - Route 53 Hosted Zone + Records
 module "dns" {
   source = "../../modules/dns"
 
@@ -35,7 +44,7 @@ module "dns" {
   create_zone               = true
 }
 
-# 5. S3 Bucket Policy for CloudFront OAC Access
+# 6. S3 Bucket Policy for CloudFront OAC Access
 resource "aws_s3_bucket_policy" "allow_cloudfront_oac" {
   bucket = module.storage.bucket_id
 
