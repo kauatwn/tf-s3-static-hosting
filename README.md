@@ -120,7 +120,7 @@ awslocal cloudfront create-invalidation --distribution-id $(terraform output -ra
 
 ## Project Structure
 
-The codebase is organized following **Clean Architecture principles applied to IaC**, cleanly segregating reusable infrastructure blocks from environmental orchestration and frontend code.
+The codebase is organized following **Modular IaC principles**, cleanly segregating reusable infrastructure blocks (Pure Modules) from environmental orchestration (Glue Code) and frontend source code.
 
 ```plaintext
 tf-s3-static-hosting/
