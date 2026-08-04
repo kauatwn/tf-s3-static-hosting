@@ -36,5 +36,6 @@ provider "aws" {
     sts        = var.localstack_endpoint
     iam        = var.localstack_endpoint
     wafv2      = var.localstack_endpoint
+    logs       = var.localstack_endpoint
   }
 }
