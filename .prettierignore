@@ -1,7 +1,5 @@
 # Agents
 .agents/
-.gemini/
-.github/
 
 # Compiled output
 /dist
