@@ -1,3 +1,12 @@
+locals {
+  common_tags = {
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+    Project     = "StaticSiteHosting"
+    Component   = "Monitoring"
+  }
+}
+
 # 1. CloudWatch Alarm - CloudFront 5xx Error Rate
 resource "aws_cloudwatch_metric_alarm" "cloudfront_5xx_errors" {
   alarm_name          = "cloudfront-high-5xx-error-rate-${var.environment}"
@@ -11,9 +20,17 @@ resource "aws_cloudwatch_metric_alarm" "cloudfront_5xx_errors" {
   alarm_description   = "Triggers when CloudFront 5xx error rate exceeds threshold."
 
   dimensions = {
-    DistributionId = var.cloudfront_distribution_id
+    DistributionId = var.targets.cloudfront_distribution_id
     Region         = "Global"
   }
+
+  tags = merge(
+    local.common_tags,
+    var.tags,
+    {
+      Name = "cloudfront-high-5xx-error-rate-${var.environment}"
+    }
+  )
 }
 
 # 2. CloudWatch Alarm - WAF Blocked Requests Spike
@@ -29,8 +46,16 @@ resource "aws_cloudwatch_metric_alarm" "waf_blocked_requests" {
   alarm_description   = "Triggers when WAF blocks a high volume of requests."
 
   dimensions = {
-    WebACL = var.web_acl_name
+    WebACL = var.targets.web_acl_name
     Region = "us-east-1"
     Rule   = "ALL"
   }
+
+  tags = merge(
+    local.common_tags,
+    var.tags,
+    {
+      Name = "waf-high-blocked-requests-${var.environment}"
+    }
+  )
 }
