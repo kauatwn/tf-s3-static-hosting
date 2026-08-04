@@ -35,6 +35,36 @@ resource "aws_cloudfront_origin_access_control" "s3_oac" {
   signing_protocol                  = "sigv4"
 }
 
+# CloudFront Response Headers Policy - Industry-standard security headers for Vite SPA
+resource "aws_cloudfront_response_headers_policy" "vite_security_headers" {
+  name    = "vite-security-headers-${var.environment}"
+  comment = "Security headers policy for Vite static site SPA (${var.environment})"
+
+  security_headers_config {
+    frame_options {
+      frame_option = "DENY"
+      override     = true
+    }
+
+    content_type_options {
+      override = true
+    }
+
+    xss_protection {
+      mode_block = true
+      protection = true
+      override   = true
+    }
+
+    strict_transport_security {
+      access_control_max_age_sec = 31536000
+      include_subdomains         = true
+      preload                    = true
+      override                   = true
+    }
+  }
+}
+
 # CloudFront Distribution - Global CDN Edge Network
 resource "aws_cloudfront_distribution" "s3_distribution" {
   enabled             = true
@@ -55,9 +85,10 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   # Default Cache Behavior
   default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3-${var.s3_origin.bucket_id}"
+    allowed_methods            = ["GET", "HEAD"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = "S3-${var.s3_origin.bucket_id}"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.vite_security_headers.id
 
     forwarded_values {
       query_string = false
@@ -71,6 +102,21 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
+  }
+
+  # Custom Error Responses for Vite SPA Client-Side Routing
+  custom_error_response {
+    error_code            = 403
+    response_code         = 200
+    response_page_path    = "/index.html"
+    error_caching_min_ttl = 10
+  }
+
+  custom_error_response {
+    error_code            = 404
+    response_code         = 200
+    response_page_path    = "/index.html"
+    error_caching_min_ttl = 10
   }
 
   # Geographic Restrictions
