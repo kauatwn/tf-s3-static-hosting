@@ -1,7 +1,24 @@
+locals {
+  common_tags = {
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+    Project     = "StaticSiteHosting"
+    Component   = "WAF"
+  }
+}
+
 # 1. CloudWatch Log Group for WAF Traffic Logs
 resource "aws_cloudwatch_log_group" "waf_logs" {
   name              = "aws-waf-logs-static-site-${var.environment}"
   retention_in_days = 30
+
+  tags = merge(
+    local.common_tags,
+    var.tags,
+    {
+      Name = "aws-waf-logs-static-site-${var.environment}"
+    }
+  )
 }
 
 # 2. WAFv2 Web ACL (Scope CLOUDFRONT)
@@ -65,6 +82,14 @@ resource "aws_wafv2_web_acl" "main" {
     metric_name                = "WebACLMetric-${var.environment}"
     sampled_requests_enabled   = true
   }
+
+  tags = merge(
+    local.common_tags,
+    var.tags,
+    {
+      Name = "waf-static-site-${var.environment}"
+    }
+  )
 }
 
 # 3. WAF Logging Configuration
