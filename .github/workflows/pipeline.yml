@@ -11,7 +11,6 @@ env:
   AWS_ACCESS_KEY_ID: "test"
   AWS_SECRET_ACCESS_KEY: "test"
   AWS_DEFAULT_REGION: "us-east-1"
-  LOCALSTACK_ENDPOINT: "http://127.0.0.1:4566"
 
 jobs:
   ci-build:
@@ -90,7 +89,7 @@ jobs:
 
       - name: "Terraform Apply 🏗️"
         working-directory: infra/environments/dev
-        run: terraform apply tfplan
+        run: terraform apply -input=false tfplan
 
       - name: "Deploy to S3 & Invalidate CloudFront Cache ☁️"
         working-directory: infra/environments/dev
