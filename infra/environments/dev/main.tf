@@ -6,7 +6,14 @@ module "storage" {
   environment = var.environment
 }
 
-# 2. CDN Module - CloudFront Distribution + OAC
+# 2. WAF Module - Web Application Firewall (Global / CloudFront Scope)
+module "waf" {
+  source = "../../modules/waf"
+
+  environment = var.environment
+}
+
+# 3. CDN Module - CloudFront Distribution + OAC + WAF Association
 module "cdn" {
   source = "../../modules/cdn"
 
@@ -15,9 +22,10 @@ module "cdn" {
   s3_bucket_domain_name  = module.storage.bucket_regional_domain_name
   s3_bucket_id           = module.storage.bucket_id
   create_acm_certificate = false # Set to false for LocalStack dev environment
+  web_acl_id             = module.waf.web_acl_arn
 }
 
-# 3. DNS Module - Route 53 Hosted Zone + Records
+# 4. DNS Module - Route 53 Hosted Zone + Records
 module "dns" {
   source = "../../modules/dns"
 
@@ -27,7 +35,7 @@ module "dns" {
   create_zone               = true
 }
 
-# 4. S3 Bucket Policy for CloudFront OAC Access
+# 5. S3 Bucket Policy for CloudFront OAC Access
 resource "aws_s3_bucket_policy" "allow_cloudfront_oac" {
   bucket = module.storage.bucket_id
 
