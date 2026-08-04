@@ -1,4 +1,10 @@
-# AWS WAFv2 Web ACL - Scope CLOUDFRONT (Must be in us-east-1 in real AWS)
+# 1. CloudWatch Log Group for WAF Traffic Logs
+resource "aws_cloudwatch_log_group" "waf_logs" {
+  name              = "aws-waf-logs-static-site-${var.environment}"
+  retention_in_days = 30
+}
+
+# 2. WAFv2 Web ACL (Scope CLOUDFRONT)
 resource "aws_wafv2_web_acl" "main" {
   name        = "waf-static-site-${var.environment}"
   description = "WAF protection for static site CloudFront distribution (${var.environment})"
@@ -31,7 +37,7 @@ resource "aws_wafv2_web_acl" "main" {
     }
   }
 
-  # Rule 2: AWS Managed Rule Set - Common Rule Set (OWASP Top 10 base protection)
+  # Rule 2: AWS Managed Rules Common Rule Set
   rule {
     name     = "AWSManagedRulesCommonRuleSet"
     priority = 2
@@ -59,4 +65,10 @@ resource "aws_wafv2_web_acl" "main" {
     metric_name                = "WebACLMetric-${var.environment}"
     sampled_requests_enabled   = true
   }
+}
+
+# 3. WAF Logging Configuration
+resource "aws_wafv2_web_acl_logging_configuration" "waf_logging" {
+  log_destination_configs = [aws_cloudwatch_log_group.waf_logs.arn]
+  resource_arn            = aws_wafv2_web_acl.main.arn
 }
