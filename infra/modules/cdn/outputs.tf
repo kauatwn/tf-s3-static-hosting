@@ -9,7 +9,7 @@ output "cloudfront_distribution_arn" {
 }
 
 output "cloudfront_domain_name" {
-  description = "The domain name of the CloudFront distribution (e.g. d111111abcdef8.cloudfront.net)."
+  description = "The domain name of the CloudFront distribution (e.g., d111111abcdef8.cloudfront.net)."
   value       = aws_cloudfront_distribution.s3_distribution.domain_name
 }
 
