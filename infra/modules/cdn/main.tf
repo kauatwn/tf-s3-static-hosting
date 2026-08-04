@@ -1,3 +1,12 @@
+locals {
+  common_tags = {
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+    Project     = "StaticSiteHosting"
+    Component   = "CDN"
+  }
+}
+
 # ACM Certificate - Managed SSL/TLS Certificate (Optional based on environment)
 resource "aws_acm_certificate" "cert" {
   count             = var.create_acm_certificate && var.domain_name != "" ? 1 : 0
@@ -7,6 +16,14 @@ resource "aws_acm_certificate" "cert" {
   lifecycle {
     create_before_destroy = true
   }
+
+  tags = merge(
+    local.common_tags,
+    var.tags,
+    {
+      Name = "cert-${var.domain_name}"
+    }
+  )
 }
 
 # CloudFront Origin Access Control (OAC) - Modern and secure alternative to OAI
@@ -31,8 +48,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   # Origin Configuration pointing to S3
   origin {
-    domain_name              = var.s3_bucket_domain_name
-    origin_id                = "S3-${var.s3_bucket_id}"
+    domain_name              = var.s3_origin.domain_name
+    origin_id                = "S3-${var.s3_origin.bucket_id}"
     origin_access_control_id = aws_cloudfront_origin_access_control.s3_oac.id
   }
 
@@ -40,7 +57,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3-${var.s3_bucket_id}"
+    target_origin_id = "S3-${var.s3_origin.bucket_id}"
 
     forwarded_values {
       query_string = false
@@ -71,4 +88,12 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     ssl_support_method             = length(aws_acm_certificate.cert) > 0 ? "sni-only" : null
     minimum_protocol_version       = length(aws_acm_certificate.cert) > 0 ? "TLSv1.2_2021" : null
   }
+
+  tags = merge(
+    local.common_tags,
+    var.tags,
+    {
+      Name = "cdn-${var.environment}"
+    }
+  )
 }
