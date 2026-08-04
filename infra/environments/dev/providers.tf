@@ -37,5 +37,6 @@ provider "aws" {
     iam        = var.localstack_endpoint
     wafv2      = var.localstack_endpoint
     logs       = var.localstack_endpoint
+    cloudwatch = var.localstack_endpoint
   }
 }
