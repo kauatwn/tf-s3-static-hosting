@@ -18,10 +18,10 @@ The primary focus of this application is not on complex frontend business logic,
 
 Ensure you have the following installed to run this project efficiently in your local environment:
 
-- **[Node.js v20+](https://nodejs.org/)** & **[pnpm](https://pnpm.io/)** (Frontend build runtime)
-- **[Terraform v1.5+](https://developer.hashicorp.com/terraform/install)** (Infrastructure orchestrator)
+- **[Node.js](https://nodejs.org/en/download)**
+- **[Terraform](https://developer.hashicorp.com/terraform/install)**
 - **[Docker](https://www.docker.com/)** (Required to run the LocalStack emulation container)
-- **[awslocal](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#awslocal)** (A thin wrapper around the AWS CLI pre-configured for LocalStack endpoints)
+- **[LocalStack AWS CLI (awslocal)](https://docs.localstack.cloud/aws/connecting/aws-cli/)** (A thin wrapper around the AWS CLI pre-configured for LocalStack endpoints)
 
 ## How to Run
 
