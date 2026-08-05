@@ -21,7 +21,7 @@ Ensure you have the following installed to run this project efficiently in your 
 - **[Node.js](https://nodejs.org/en/download)**
 - **[Terraform](https://developer.hashicorp.com/terraform/install)**
 - **[Docker](https://www.docker.com/)** (Required to run the LocalStack emulation container)
-- **[LocalStack AWS CLI (awslocal)](https://docs.localstack.cloud/aws/connecting/aws-cli/)** (A thin wrapper around the AWS CLI pre-configured for LocalStack endpoints)
+- **[AWS CLI)](https://docs.localstack.cloud/aws/connecting/aws-cli/)**
 
 ## How to Run
 
@@ -107,15 +107,22 @@ terraform apply -input=false tfplan
 Upload the static files to the completely private S3 bucket:
 
 ```bash
-awslocal s3 sync ../../../dist s3://$(terraform output -raw s3_bucket_name) --delete
+aws s3 sync ../../../dist s3://$(terraform output -raw s3_bucket_name) --delete
 ```
+
+> [!NOTE]
+> The command above assumes your terminal is currently inside the `infra/environments/dev` directory. If you are executing this from the project's root directory (`tf-s3-static-hosting`), adjust the source path to `./dist` and use the `-chdir` flag for Terraform:
+>
+> ```bash
+> aws s3 sync ./dist s3://$(terraform -chdir=infra/environments/dev output -raw s3_bucket_name) --delete
+> ```
 
 ### 11. Invalidate Edge Cache
 
 Purge the CloudFront distribution cache to guarantee that your updates are instantly available globally:
 
 ```bash
-awslocal cloudfront create-invalidation --distribution-id $(terraform output -raw cloudfront_distribution_id) --paths "/*"
+aws cloudfront create-invalidation --distribution-id $(terraform output -raw cloudfront_distribution_id) --paths "/*" --profile localstack
 ```
 
 ## Project Structure
