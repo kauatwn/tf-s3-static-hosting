@@ -152,9 +152,7 @@ Este repositório prioriza uma **Arquitetura Serverless Entregue na Borda (Edge-
 
 ### 1. Ciclo de Vida da Requisição Protegida na Borda
 
-_(Coloque a imagem do diagrama da sua arquitetura dentro da pasta assets e faça a referência abaixo)_
-
-_Figura 1: Pipeline síncrono de requisições na borda, desde a resolução DNS no Route 53, passando pelo WAFv2 e cache do CloudFront, até a origem privada no S3._
+_O pipeline síncrono de requisições na borda segue um fluxo direto, desde a resolução DNS no Route 53, passando pelo WAFv2 e cache do CloudFront, até à origem privada no S3:_
 
 - **O Ponto de Entrada (Entrypoint):** O cliente resolve o domínio através do **Amazon Route 53** usando registros Alias `A`/`AAAA` apontando diretamente para a rede de borda da CDN.
 - **O Perímetro da Borda (Edge Perimeter):** Antes de chegar a qualquer camada de armazenamento, as requisições passam pelo **AWS WAFv2** para inspeção de Camada 7, incluindo _rate limiting_ e regras gerenciadas (AWS Managed Rules).
