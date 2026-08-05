@@ -152,9 +152,7 @@ This repository prioritizes a **Serverless Edge-Delivered Architecture** coupled
 
 ### 1. Edge-Secured Request Lifecycle
 
-_(Place your architecture diagram image inside the assets folder and reference it below)_
-
-_Figure 1: Synchronous edge request pipeline from Route 53 DNS resolution through WAFv2 and CloudFront caching to the private S3 origin._
+_The synchronous edge request pipeline follows a direct flow, from DNS resolution in Route 53, passing through WAFv2 and CloudFront caching, to the private origin in S3:_
 
 - **The Entrypoint:** The client resolves the domain via **Amazon Route 53** using `A`/`AAAA` Alias records pointing directly to the CDN edge network.
 - **The Edge Perimeter:** Before reaching any storage layer, requests pass through **AWS WAFv2** for Layer 7 inspection, including rate limiting and AWS Managed Rules.
