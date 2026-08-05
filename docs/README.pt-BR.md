@@ -21,7 +21,7 @@ Certifique-se de ter os seguintes itens instalados para executar este projeto de
 - **[Node.js](https://nodejs.org/)**
 - **[Terraform](https://developer.hashicorp.com/terraform/install)**
 - **[Docker](https://www.docker.com/)** (Necessário para rodar o container de emulação do LocalStack)
-- **[LocalStack AWS CLI (awslocal)](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#awslocal)** (Um _wrapper_ leve do AWS CLI pré-configurado para os endpoints do LocalStack)
+- **[AWS CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/)**
 
 ## Como Executar
 
@@ -107,15 +107,22 @@ terraform apply -input=false tfplan
 Faça o upload dos arquivos estáticos para o bucket S3 (que é completamente privado):
 
 ```bash
-awslocal s3 sync ../../../dist s3://$(terraform output -raw s3_bucket_name) --delete
+aws s3 sync ../../../dist s3://$(terraform output -raw s3_bucket_name) --delete
 ```
+
+> [!NOTE]
+> O comando acima assume que o seu terminal ainda está dentro do diretório `infra/environments/dev`. Se você estiver executando a partir da raiz do projeto (`tf-s3-static-hosting`), ajuste o caminho de origem para `./dist` e adicione a flag `-chdir` no Terraform:
+>
+> ```bash
+> aws s3 sync ./dist s3://$(terraform -chdir=infra/environments/dev output -raw s3_bucket_name) --delete
+> ```
 
 ### 11. Invalide o Cache da Borda (Edge)
 
 Limpe o cache da distribuição do CloudFront para garantir que suas atualizações fiquem disponíveis globalmente de forma instantânea:
 
 ```bash
-awslocal cloudfront create-invalidation --distribution-id $(terraform output -raw cloudfront_distribution_id) --paths "/*"
+aws cloudfront create-invalidation --distribution-id $(terraform output -raw cloudfront_distribution_id) --paths "/*" --profile localstack
 ```
 
 ## Estrutura do Projeto
