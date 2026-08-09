@@ -1,11 +1,5 @@
 locals {
   zone_id = var.create_zone ? aws_route53_zone.primary[0].zone_id : data.aws_route53_zone.existing[0].zone_id
-  common_tags = {
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-    Project     = "StaticSiteHosting"
-    Component   = "DNS"
-  }
 }
 
 # Amazon Route 53 - Hosted Zone creation (Conditional)
@@ -14,10 +8,10 @@ resource "aws_route53_zone" "primary" {
   name  = var.domain_name
 
   tags = merge(
-    local.common_tags,
     var.tags,
     {
-      Name = "HostedZone-${var.domain_name}"
+      Name      = "HostedZone-${var.domain_name}"
+      Component = "DNS"
     }
   )
 }

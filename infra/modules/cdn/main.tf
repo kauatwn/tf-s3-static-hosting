@@ -1,12 +1,3 @@
-locals {
-  common_tags = {
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-    Project     = "StaticSiteHosting"
-    Component   = "CDN"
-  }
-}
-
 # ACM Certificate - Managed SSL/TLS Certificate (Optional based on environment)
 resource "aws_acm_certificate" "cert" {
   count             = var.create_acm_certificate && var.domain_name != "" ? 1 : 0
@@ -18,10 +9,10 @@ resource "aws_acm_certificate" "cert" {
   }
 
   tags = merge(
-    local.common_tags,
     var.tags,
     {
-      Name = "cert-${var.domain_name}"
+      Name      = "cert-${var.domain_name}"
+      Component = "CDN"
     }
   )
 }
@@ -136,10 +127,10 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   tags = merge(
-    local.common_tags,
     var.tags,
     {
-      Name = "cdn-${var.environment}"
+      Name      = "cdn-${var.environment}"
+      Component = "CDN"
     }
   )
 }
