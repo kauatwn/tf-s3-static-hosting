@@ -17,8 +17,10 @@ module "storage" {
 
 # 2. WAF Module - Web ACL & CloudWatch Logging
 module "waf" {
+  count  = var.enable_waf ? 1 : 0
   source = "../../modules/waf"
 
+  enable_waf  = var.enable_waf
   environment = var.environment
   tags        = local.common_tags
 }
@@ -34,7 +36,8 @@ module "cdn" {
     bucket_id   = module.storage.bucket_id
   }
   create_acm_certificate = false # Set to false for LocalStack dev environment
-  web_acl_id             = module.waf.web_acl_arn
+  enable_waf             = var.enable_waf
+  web_acl_id             = var.enable_waf ? module.waf[0].web_acl_arn : null
   tags                   = local.common_tags
 }
 

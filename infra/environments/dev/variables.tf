@@ -47,3 +47,9 @@ variable "bucket_name" {
     error_message = "The bucket_name must be between 3 and 63 characters long, contain only lowercase letters, numbers, hyphens, and dots, and start/end with an alphanumeric character."
   }
 }
+
+variable "enable_waf" {
+  type        = bool
+  default     = false
+  description = "Toggle WAF module creation and CDN association."
+}
