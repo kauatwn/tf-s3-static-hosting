@@ -39,3 +39,9 @@ variable "tags" {
   default     = {}
   description = "Optional map of additional resource tags to be merged with common_tags."
 }
+
+variable "enable_waf" {
+  type        = bool
+  default     = false
+  description = "Toggle WAF integration on CloudFront."
+}
