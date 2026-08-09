@@ -6,33 +6,33 @@ on:
     types:
       - completed
     branches: ["main"]
-  workflow_dispatch:
 
 jobs:
   deploy:
     name: "Provision & Deploy to LocalStack"
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-24.04
+
+    permissions:
+      contents: read
+      actions: read
+
+    env:
+      AWS_ACCESS_KEY_ID: "test"
+      AWS_SECRET_ACCESS_KEY: "test"
+      AWS_DEFAULT_REGION: "us-east-1"
 
     steps:
       - name: "Checkout repository 🛎️"
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: "Download Artifact (Automatic via workflow_run) 📦"
-        if: ${{ github.event_name == 'workflow_run' }}
+      - name: "Download Build Artifact 📦"
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: ${{ github.event.repository.name }}-build
           path: dist/
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: "Download Artifact (Manual via workflow_dispatch) 📦"
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: ${{ github.event.repository.name }}-build
-          path: dist/
 
       - name: "Start LocalStack 🐳"
         uses: LocalStack/setup-localstack@7c8a0cb3405bc58be4c8f763f812aa000bc46303 # v0.3.2
@@ -54,15 +54,14 @@ jobs:
 
       - name: "Deploy to S3 & Invalidate CloudFront Cache ☁️"
         working-directory: infra/environments/dev
+        env:
+          LOCALSTACK_ENDPOINT: "http://127.0.0.1:4566"
         run: |
           BUCKET_NAME=$(terraform output -raw s3_bucket_name)
           CF_DIST_ID=$(terraform output -raw cloudfront_distribution_id)
-          ENDPOINT_URL="http://localhost:4566"
 
           echo "🚀 Uploading static files to S3: $BUCKET_NAME"
-          aws --endpoint-url=$ENDPOINT_URL s3 sync "$GITHUB_WORKSPACE/dist/" "s3://$BUCKET_NAME" --delete
+          aws --endpoint-url="$LOCALSTACK_ENDPOINT" s3 sync "$GITHUB_WORKSPACE/dist/" "s3://$BUCKET_NAME" --delete
 
           echo "🔄 Invalidating CloudFront cache: $CF_DIST_ID"
-          aws --endpoint-url=$ENDPOINT_URL cloudfront create-invalidation \
-            --distribution-id "$CF_DIST_ID" \
-            --paths "/*"
+          aws --endpoint-url="$LOCALSTACK_ENDPOINT" cloudfront create-invalidation --distribution-id "$CF_DIST_ID" --paths "/*"
