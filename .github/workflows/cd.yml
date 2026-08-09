@@ -38,7 +38,6 @@ jobs:
         uses: LocalStack/setup-localstack@7c8a0cb3405bc58be4c8f763f812aa000bc46303 # v0.3.2
         with:
           image-tag: "2026.07.0"
-          install-awslocal: "true"
         env:
           LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 
@@ -56,14 +55,14 @@ jobs:
       - name: "Deploy to S3 & Invalidate CloudFront Cache ☁️"
         working-directory: infra/environments/dev
         run: |
-          # 1. Get resource names created by Terraform
           BUCKET_NAME=$(terraform output -raw s3_bucket_name)
           CF_DIST_ID=$(terraform output -raw cloudfront_distribution_id)
+          ENDPOINT_URL="http://localhost:4566"
 
           echo "🚀 Uploading static files to S3: $BUCKET_NAME"
-          awslocal s3 sync "$GITHUB_WORKSPACE/dist/" "s3://$BUCKET_NAME" --delete
+          aws --endpoint-url=$ENDPOINT_URL s3 sync "$GITHUB_WORKSPACE/dist/" "s3://$BUCKET_NAME" --delete
 
           echo "🔄 Invalidating CloudFront cache: $CF_DIST_ID"
-          awslocal cloudfront create-invalidation \
+          aws --endpoint-url=$ENDPOINT_URL cloudfront create-invalidation \
             --distribution-id "$CF_DIST_ID" \
             --paths "/*"
