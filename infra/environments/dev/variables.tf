@@ -53,3 +53,9 @@ variable "enable_waf" {
   default     = false
   description = "Toggle WAF module creation and CDN association."
 }
+
+variable "project_name" {
+  type        = string
+  default     = "StaticSiteHosting"
+  description = "Project name to be applied as default tag."
+}
