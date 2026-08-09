@@ -1,22 +1,13 @@
-locals {
-  common_tags = {
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-    Project     = "StaticSiteHosting"
-    Component   = "Storage"
-  }
-}
-
 # Amazon S3 - Static Site Content Storage
 resource "aws_s3_bucket" "static_site" {
   bucket        = var.bucket_name
   force_destroy = var.environment == "dev" ? true : false
 
   tags = merge(
-    local.common_tags,
     var.tags,
     {
-      Name = var.bucket_name
+      Name      = var.bucket_name
+      Component = "Storage"
     }
   )
 }

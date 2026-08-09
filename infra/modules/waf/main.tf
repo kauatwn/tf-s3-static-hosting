@@ -1,22 +1,13 @@
-locals {
-  common_tags = {
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-    Project     = "StaticSiteHosting"
-    Component   = "WAF"
-  }
-}
-
 # 1. CloudWatch Log Group for WAF Traffic Logs
 resource "aws_cloudwatch_log_group" "waf_logs" {
   name              = "aws-waf-logs-static-site-${var.environment}"
   retention_in_days = 30
 
   tags = merge(
-    local.common_tags,
     var.tags,
     {
-      Name = "aws-waf-logs-static-site-${var.environment}"
+      Name      = "aws-waf-logs-static-site-${var.environment}"
+      Component = "WAF"
     }
   )
 }
@@ -84,10 +75,10 @@ resource "aws_wafv2_web_acl" "main" {
   }
 
   tags = merge(
-    local.common_tags,
     var.tags,
     {
-      Name = "waf-static-site-${var.environment}"
+      Name      = "waf-static-site-${var.environment}"
+      Component = "WAF"
     }
   )
 }

@@ -1,18 +1,9 @@
-locals {
-  common_tags = {
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-    Project     = "StaticSiteHosting"
-  }
-}
-
 # 1. Primary Storage Module - S3 Bucket
 module "storage" {
   source = "../../modules/storage"
 
   bucket_name = var.bucket_name
   environment = var.environment
-  tags        = local.common_tags
 }
 
 # 2. WAF Module - Web ACL & CloudWatch Logging
@@ -22,7 +13,6 @@ module "waf" {
 
   enable_waf  = var.enable_waf
   environment = var.environment
-  tags        = local.common_tags
 }
 
 # 3. CDN Module - CloudFront Distribution + OAC + WAF Association
@@ -38,7 +28,6 @@ module "cdn" {
   create_acm_certificate = false # Set to false for LocalStack dev environment
   enable_waf             = var.enable_waf
   web_acl_id             = var.enable_waf ? module.waf[0].web_acl_arn : null
-  tags                   = local.common_tags
 }
 
 # 4. Monitoring Module - CloudWatch Metrics & Alarms
@@ -48,9 +37,8 @@ module "monitoring" {
   environment = var.environment
   targets = {
     cloudfront_distribution_id = module.cdn.cloudfront_distribution_id
-    web_acl_name               = "waf-static-site-${var.environment}"
+    web_acl_name               = var.enable_waf ? module.waf[0].web_acl_name : null
   }
-  tags = local.common_tags
 }
 
 # 5. DNS Module - Route 53 Hosted Zone + Records
@@ -64,7 +52,6 @@ module "dns" {
     hosted_zone_id = module.cdn.cloudfront_hosted_zone_id
   }
   create_zone = true
-  tags        = local.common_tags
 }
 
 # 6. S3 Bucket Policy for CloudFront OAC Access

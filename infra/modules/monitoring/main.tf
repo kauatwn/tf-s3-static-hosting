@@ -1,12 +1,3 @@
-locals {
-  common_tags = {
-    Environment = var.environment
-    ManagedBy   = "Terraform"
-    Project     = "StaticSiteHosting"
-    Component   = "Monitoring"
-  }
-}
-
 # 1. CloudWatch Alarm - CloudFront 5xx Error Rate
 resource "aws_cloudwatch_metric_alarm" "cloudfront_5xx_errors" {
   alarm_name          = "cloudfront-high-5xx-error-rate-${var.environment}"
@@ -25,10 +16,10 @@ resource "aws_cloudwatch_metric_alarm" "cloudfront_5xx_errors" {
   }
 
   tags = merge(
-    local.common_tags,
     var.tags,
     {
-      Name = "cloudfront-high-5xx-error-rate-${var.environment}"
+      Name      = "cloudfront-high-5xx-error-rate-${var.environment}"
+      Component = "Monitoring"
     }
   )
 }
@@ -52,10 +43,10 @@ resource "aws_cloudwatch_metric_alarm" "waf_blocked_requests" {
   }
 
   tags = merge(
-    local.common_tags,
     var.tags,
     {
-      Name = "waf-high-blocked-requests-${var.environment}"
+      Name      = "waf-high-blocked-requests-${var.environment}"
+      Component = "Monitoring"
     }
   )
 }
