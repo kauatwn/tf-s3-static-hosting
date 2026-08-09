@@ -71,7 +71,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   is_ipv6_enabled     = true
   comment             = "Static site distribution (${var.environment})"
   default_root_object = "index.html"
-  web_acl_id          = var.web_acl_id
+  web_acl_id          = var.enable_waf ? var.web_acl_id : null
 
   # Custom CNAME aliases (Only set when domain_name is provided)
   aliases = var.domain_name != "" ? [var.domain_name] : []
@@ -109,14 +109,14 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     error_code            = 403
     response_code         = 200
     response_page_path    = "/index.html"
-    error_caching_min_ttl = 10
+    error_caching_min_ttl = 3600
   }
 
   custom_error_response {
     error_code            = 404
-    response_code         = 200
-    response_page_path    = "/index.html"
-    error_caching_min_ttl = 10
+    response_code         = 404
+    response_page_path    = "/404.html"
+    error_caching_min_ttl = 3600
   }
 
   # Geographic Restrictions
