@@ -43,7 +43,7 @@ The choice of components and modules focuses on maximum security combined with c
 
 Environment provisioning and lifecycle management are handled declaratively and modularly through **Terraform**. The project adopts Inversion of Control through the **Pure Modules** pattern and an orchestrating **Root Module**:
 
-- **Pure Modules (****`/infra/modules/*`****):** Components (`storage`, `cdn`, `waf`, `dns`, `monitoring`) are stateless and have no knowledge of other modules. They receive strictly typed dependencies (`object({})`) through their variables. The S3 module, for example, can be reused in other company contexts (such as logs or backups) without requiring refactoring, as it is not natively coupled to a CDN.
+- **Pure Modules (****`/infra/modules/*`****):** Components (`s3`, `cloudfront`, `waf`, `route53`, `cloudwatch`) are stateless and have no knowledge of other modules. They receive strictly typed dependencies (`object({})`) through their variables. The S3 module, for example, can be reused in other company contexts (such as logs or backups) without requiring refactoring, as it is not natively coupled to a CDN.
 
 - **Glue Code (****`/infra/environments/dev/main.tf`****):** Acts as the conductor. It is responsible for instantiating the modules, extracting an _output_ from one (e.g., the Web ACL ARN), and injecting it as an _input_ into another (e.g., the CloudFront distribution configuration), ensuring a linear and deterministic dependency graph that eliminates Terraform execution failures.
 
