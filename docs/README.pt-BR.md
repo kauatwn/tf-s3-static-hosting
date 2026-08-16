@@ -40,7 +40,7 @@ A escolha dos componentes e módulos foca em segurança máxima aliada a previsi
 
 O provisionamento e o ciclo de vida do ambiente são gerenciados de forma declarativa e modular através do **Terraform**. O projeto adota a Inversão de Controle com o padrão de **Módulos Puros (Pure Modules)** e um **Root Module** orquestrador:
 
-- **Módulos Puros (`/infra/modules/*`):** Componentes (`storage`, `cdn`, `waf`, `dns`, `monitoring`) são stateless e não possuem conhecimento de outros módulos. Eles recebem as dependências rigidamente tipadas (`object({})`) através de suas variáveis. O módulo S3, por exemplo, pode ser reaproveitado em outros contextos da empresa (como logs ou backups) sem necessidade de refatoração, pois não é atrelado nativamente a uma CDN.
+- **Módulos Puros (`/infra/modules/*`):** Componentes (`s3`, `cloudfront`, `waf`, `route53`, `cloudwatch`) são stateless e não possuem conhecimento de outros módulos. Eles recebem as dependências rigidamente tipadas (`object({})`) através de suas variáveis. O módulo S3, por exemplo, pode ser reaproveitado em outros contextos da empresa (como logs ou backups) sem necessidade de refatoração, pois não é atrelado nativamente a uma CDN.
 - **Código Cola / Glue Code (`/infra/environments/dev/main.tf`):** Atua como o maestro. É responsável por instanciar os módulos, extrair o _output_ de um (ex: o ARN do Web ACL) e injetar como _input_ de outro (ex: as configurações da distribuição do CloudFront), garantindo um grafo de dependências linear e determinístico que elimina falhas de execução no Terraform.
 
 ## 6. Limitações Conhecidas e Trade-offs
