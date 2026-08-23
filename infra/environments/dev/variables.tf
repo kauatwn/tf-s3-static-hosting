@@ -20,6 +20,17 @@ variable "environment" {
   }
 }
 
+variable "project_name" {
+  type        = string
+  default     = "StaticSiteHosting"
+  description = "Project name to be applied as default tag."
+
+  validation {
+    condition     = length(trimspace(var.project_name)) > 0
+    error_message = "The project_name must not be empty."
+  }
+}
+
 variable "localstack_endpoint" {
   type        = string
   default     = "http://localhost:4566"
@@ -35,6 +46,11 @@ variable "domain_name" {
   type        = string
   default     = "mysite.local"
   description = "Domain name used for website routing and DNS records."
+
+  validation {
+    condition     = length(trimspace(var.domain_name)) > 0
+    error_message = "The domain_name must not be empty."
+  }
 }
 
 variable "bucket_name" {
@@ -52,10 +68,4 @@ variable "enable_waf" {
   type        = bool
   default     = false
   description = "Toggle WAF module creation and CDN association."
-}
-
-variable "project_name" {
-  type        = string
-  default     = "StaticSiteHosting"
-  description = "Project name to be applied as default tag."
 }

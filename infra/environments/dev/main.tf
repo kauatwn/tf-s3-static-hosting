@@ -1,21 +1,31 @@
-# 1. Primary Storage Module - S3 Bucket
+locals {
+  common_tags = {
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+    Project     = var.project_name
+  }
+}
+
+# 1. Primary Storage Module - S3 Bucket with SSE-S3 & Public Access Block
 module "s3" {
   source = "../../modules/s3"
 
   bucket_name = var.bucket_name
   environment = var.environment
+  tags        = local.common_tags
 }
 
-# 2. WAF Module - Web ACL & CloudWatch Logging
+# 2. WAF Module - Web ACL & CloudWatch Logging (Optional in Dev)
 module "waf" {
   count  = var.enable_waf ? 1 : 0
   source = "../../modules/waf"
 
   enable_waf  = var.enable_waf
   environment = var.environment
+  tags        = local.common_tags
 }
 
-# 3. CDN Module - CloudFront Distribution + OAC + WAF Association
+# 3. CDN Module - CloudFront Distribution + OAC + Security Headers Policy
 module "cloudfront" {
   source = "../../modules/cloudfront"
 
@@ -25,9 +35,10 @@ module "cloudfront" {
     domain_name = module.s3.bucket_regional_domain_name
     bucket_id   = module.s3.bucket_id
   }
-  create_acm_certificate = false # Set to false for LocalStack dev environment
+  create_acm_certificate = false # Disabled for LocalStack dev environment
   enable_waf             = var.enable_waf
   web_acl_id             = var.enable_waf ? module.waf[0].web_acl_arn : null
+  tags                   = local.common_tags
 }
 
 # 4. Monitoring Module - CloudWatch Metrics & Alarms
@@ -39,9 +50,10 @@ module "cloudwatch" {
     cloudfront_distribution_id = module.cloudfront.cloudfront_distribution_id
     web_acl_name               = var.enable_waf ? module.waf[0].web_acl_name : null
   }
+  tags = local.common_tags
 }
 
-# 5. DNS Module - Route 53 Hosted Zone + Records
+# 5. DNS Module - Route 53 Hosted Zone + Alias Records
 module "route53" {
   source = "../../modules/route53"
 
@@ -52,9 +64,10 @@ module "route53" {
     hosted_zone_id = module.cloudfront.cloudfront_hosted_zone_id
   }
   create_zone = true
+  tags        = local.common_tags
 }
 
-# 6. S3 Bucket Policy for CloudFront OAC Access
+# 6. S3 Bucket Policy for CloudFront OAC Access (Origin Protection)
 resource "aws_s3_bucket_policy" "allow_cloudfront_oac" {
   bucket = module.s3.bucket_id
 
