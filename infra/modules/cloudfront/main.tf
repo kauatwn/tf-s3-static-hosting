@@ -1,6 +1,7 @@
-# Managed Cache Policy for CloudFront
-data "aws_cloudfront_cache_policy" "caching_optimized" {
-  name = "Managed-CachingOptimized"
+# AWS Managed-CachingOptimized Policy ID (Canonical AWS Managed Policy ID)
+# Reference: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html
+locals {
+  managed_caching_optimized_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6"
 }
 
 # ACM Certificate - Managed SSL/TLS Certificate (Optional based on environment)
@@ -85,7 +86,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     allowed_methods            = ["GET", "HEAD"]
     cached_methods             = ["GET", "HEAD"]
     target_origin_id           = "S3-${var.s3_origin.bucket_id}"
-    cache_policy_id            = data.aws_cloudfront_cache_policy.caching_optimized.id
+    cache_policy_id            = local.managed_caching_optimized_policy_id
     response_headers_policy_id = aws_cloudfront_response_headers_policy.vite_security_headers.id
     viewer_protocol_policy     = "redirect-to-https"
   }
