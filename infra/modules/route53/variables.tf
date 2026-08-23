@@ -1,6 +1,11 @@
 variable "domain_name" {
   type        = string
   description = "The primary domain name for the Route 53 hosted zone (e.g., example.com)."
+
+  validation {
+    condition     = length(trimspace(var.domain_name)) > 0
+    error_message = "The domain_name must not be empty."
+  }
 }
 
 variable "environment" {
