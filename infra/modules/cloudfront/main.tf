@@ -1,3 +1,8 @@
+# Managed Cache Policy for CloudFront
+data "aws_cloudfront_cache_policy" "caching_optimized" {
+  name = "Managed-CachingOptimized"
+}
+
 # ACM Certificate - Managed SSL/TLS Certificate (Optional based on environment)
 resource "aws_acm_certificate" "cert" {
   count             = var.create_acm_certificate && var.domain_name != "" ? 1 : 0
@@ -62,6 +67,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   is_ipv6_enabled     = true
   comment             = "Static site distribution (${var.environment})"
   default_root_object = "index.html"
+  price_class         = var.price_class
   web_acl_id          = var.enable_waf ? var.web_acl_id : null
 
   # Custom CNAME aliases (Only set when domain_name is provided)
@@ -74,25 +80,14 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     origin_access_control_id = aws_cloudfront_origin_access_control.s3_oac.id
   }
 
-  # Default Cache Behavior
+  # Default Cache Behavior with Managed Caching Policy
   default_cache_behavior {
     allowed_methods            = ["GET", "HEAD"]
     cached_methods             = ["GET", "HEAD"]
     target_origin_id           = "S3-${var.s3_origin.bucket_id}"
+    cache_policy_id            = data.aws_cloudfront_cache_policy.caching_optimized.id
     response_headers_policy_id = aws_cloudfront_response_headers_policy.vite_security_headers.id
-
-    forwarded_values {
-      query_string = false
-
-      cookies {
-        forward = "none"
-      }
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    viewer_protocol_policy     = "redirect-to-https"
   }
 
   # Custom Error Responses for Vite SPA Client-Side Routing
@@ -119,7 +114,6 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   # SSL/TLS Viewer Certificate Configuration
   viewer_certificate {
-    # If custom certificate exists, use it; otherwise, fall back to default CloudFront cert (*.cloudfront.net)
     acm_certificate_arn            = length(aws_acm_certificate.cert) > 0 ? aws_acm_certificate.cert[0].arn : null
     cloudfront_default_certificate = length(aws_acm_certificate.cert) == 0
     ssl_support_method             = length(aws_acm_certificate.cert) > 0 ? "sni-only" : null
