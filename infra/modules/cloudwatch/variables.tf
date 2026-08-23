@@ -11,9 +11,9 @@ variable "environment" {
 variable "targets" {
   type = object({
     cloudfront_distribution_id = string
-    web_acl_name               = string
+    web_acl_name               = optional(string, null)
   })
-  description = "Target resource identifiers for CloudWatch metrics monitoring (CloudFront ID and WAF Web ACL name)."
+  description = "Target resource identifiers for CloudWatch metrics monitoring (CloudFront ID and optional WAF Web ACL name)."
 }
 
 variable "tags" {
