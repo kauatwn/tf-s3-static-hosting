@@ -24,8 +24,9 @@ resource "aws_cloudwatch_metric_alarm" "cloudfront_5xx_errors" {
   )
 }
 
-# 2. CloudWatch Alarm - WAF Blocked Requests Spike
+# 2. CloudWatch Alarm - WAF Blocked Requests Spike (Conditional on WAF target presence)
 resource "aws_cloudwatch_metric_alarm" "waf_blocked_requests" {
+  count               = var.targets.web_acl_name != null && var.targets.web_acl_name != "" ? 1 : 0
   alarm_name          = "waf-high-blocked-requests-${var.environment}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
