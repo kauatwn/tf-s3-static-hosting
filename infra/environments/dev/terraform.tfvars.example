@@ -1,6 +1,7 @@
-# Example configuration for LocalStack development environment
 aws_region          = "us-east-1"
 environment         = "dev"
+project_name        = "StaticSiteHosting"
 localstack_endpoint = "http://localhost:4566"
 domain_name         = "mysite.local"
 bucket_name         = "my-static-site-dev-bucket"
+enable_waf          = false
