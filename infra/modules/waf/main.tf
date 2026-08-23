@@ -1,7 +1,7 @@
-# 1. CloudWatch Log Group for WAF Traffic Logs
+# 1. CloudWatch Log Group for WAF Traffic Logs (Requires aws-waf-logs- prefix)
 resource "aws_cloudwatch_log_group" "waf_logs" {
   name              = "aws-waf-logs-static-site-${var.environment}"
-  retention_in_days = 30
+  retention_in_days = var.log_retention_in_days
 
   tags = merge(
     var.tags,
